@@ -3,7 +3,7 @@
 
 ```
 Barcode xxx zzz yyy
-
+Treatment A  B   C
 ID
 gene1	100 200 300
 gene2	10  20  30
@@ -29,7 +29,11 @@ var types
 Array
 Spot
 Color
-
+rowSeq
+colSeq
+IsOutlier
+QuantitationType
+value
 
 [
 {"name": "rowSeq",
