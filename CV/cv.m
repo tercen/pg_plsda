@@ -105,7 +105,7 @@ classdef cv
                 return
             end
             
-            RandStream.setDefaultStream ...
+            RandStream.setGlobalStream ...
                 (RandStream('mt19937ar','seed',sum(100*clock)));
             bWaitBar = oc.verbose;
             if bWaitBar
