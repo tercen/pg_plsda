@@ -3,7 +3,7 @@ addpath(genpath('/media/thiago/EXTRALINUX/Upwork/code/pg_plsda/DataFrameOperator
 addpath(genpath('/media/thiago/EXTRALINUX/Upwork/code/pg_plsda/mgPlsda'))
 addpath(genpath('/media/thiago/EXTRALINUX/Upwork/code/pg_plsda/CV'))
 
-plsda('--infile=/media/thiago/EXTRALINUX/Upwork/code/pg_plsda/data/FGFR example.txt.csv');
+plsda('--infile=/media/thiago/EXTRALINUX/Upwork/code/pg_plsda/test/test_input.json');
  
 rmpath(genpath('/media/thiago/EXTRALINUX/Upwork/code/pg_plsda/main'))
 rmpath(genpath('/media/thiago/EXTRALINUX/Upwork/code/pg_plsda/DataFrameOperator'))

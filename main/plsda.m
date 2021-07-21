@@ -1,6 +1,7 @@
 function plsda(arglist)
 clc;
     global data
+    global metaData
     global MaxComponents
     global AutoScale
     global Bagging
@@ -15,173 +16,25 @@ clc;
 
 if exitCode == 0
 %     pgp_io_read_factor_table(params.infile);
-    [dataTable, metaData, exitCode] = pgp_io_read_factor_table(params.infile);
-    
-  
-    % defaults as per dataFrameOperator
-    % These values ar ebeing set here:
-    % operatorProperties
-    CrossValidation = '10-fold';
-    AutoScale       = false;
-    MaxComponents   = 1;
-    NumberOfBags    = 24;
-    Bagging         = 'Balance';
-    Optimization    = 'auto';
-    Permutations    = 10;
-    SaveClassifier  = 'no';
+    [ exitCode] = pgp_io_read_params_json(params.infile);
 end
 
 if exitCode == 0
-
     
-    data = dataTable;
-    
-    warning 'off';
-
-%     %% input formatting and checking
-%     if length(unique(data.QuantitationType)) ~= 1
-%         exitCode = -6;
-%         pgp_util_error_message(exitCode);
-% %         error('PLS-DA cannot handle multiple quantitation types');
-%     end
-%     % predictor matrix
-%     X = flat2mat(data.value, data.rowSeq, data.colSeq)';
-%     
-%     if any(isnan(X(:)))
-%         error('Missing values are not allowed');
-%     end
-%     % response variable
-%     varType     = metaData(:,2);
-%     %get(data, 'VarDescription');
-%     varNames    = metaData(:,1);
-% 
-% %     get(data, 'VarNames');
-%     yName = varNames(contains(varType, 'Color', 'IgnoreCase', true));
-%     
-%     if length(yName) ~= 1
-%         error('Grouping must be defined using exactly one data color');
-%     end
-%     yName = char(yName);
-%     
-%     y = flat2ColumnAnnotation(data.(yName), data.rowSeq, data.colSeq);
-%     nGroups = length(unique(y));
-%     if nGroups < 2
-%         error('Grouping must contain at least two different levels');
-%     end
-%     
-%     
-%     % retrieve spot ID's for later use
-%     bID = strcmpi('Spot', varType) & strcmpi('ID', varNames);
-%     if sum(bID) ~= 1
-%         error('Spot ID could not be retrieved')
-%     end
-%     spotID = flat2RowAnnotation(data.ID, data.rowSeq, data.colSeq);
-%     
-%     
-%     % create sample labels
-%     labelIdx = find(contains(varType, 'Array', 'IgnoreCase', true));
-%     for i=1:length(labelIdx)
-%         label(:,i) = nominal(flat2ColumnAnnotation(data.(varNames{labelIdx(i)}), data.rowSeq, data.colSeq));
-%         % (creating a nominal nicely handles different types of experimental
-%         % factors)
-%     end
-%     for i=1:size(label,1)
-%         strLabel{i} =paste(cellstr(label(i,:)), '/');
-%     end
-%     
-
-
-    [exitCode, X, y, spotID, strLabel] = pgp_data_format(data, metaData);
+    [exitCode, X, y, spotID, strLabel] = pgp_data_format();
+   
 end
 
 if exitCode == 0
-    %% initialize cross validation object and pls object
-    aCv         = cv;
-    aCv.verbose = true;
-    switch CrossValidation
-        case 'none'
-            %
-        case 'LOOCV'
-            aCv.partition = cvpartition(y, 'leave');
-        case '10-fold'
-            aCv.partition = cvpartition(y, 'k', 10);
-        case '20-fold'
-            aCv.partition = cvpartition(y, 'k', 20);
-        otherwise
-            exitCode = -11;
-            pgp_util_error_message(exitCode, 'CrossValidation');
-%             
-%             error('Invalid value for property ''CrossValidation''');
-    end
-    
+    [exitCode] = pgp_train(X, y, spotID, strLabel);
 end
     
-if exitCode == 0
-    aPls = mgPlsda;
-    aPls.features = 1:MaxComponents; % pls components to try
-    if isequal(AutoScale, 'Yes') % autoscaling
-        aPls.autoscale = true;
-    else
-        aPls.autoscale = false;
-    end
-    
-    switch Bagging
-        case 'None'
-            aPls.bagging = 'none';
-        case 'Balance'
-             aPls.bagging = 'balance';
-        case 'Bootstrap'
-            aPls.bagging = 'bootstrap';
-        case 'Jackknife'
-            aPls.bagging = 'jackknife';
-        otherwise
-            exitCode = -11;
-            pgp_util_error_message(exitCode, 'Bagging');
-%             error('Invalid value for property ''Bagging''')
-    end
-end
-
-if exitCode == 0
-    aPls.numberOfBags = NumberOfBags;
-    
-    switch Optimization
-        case 'auto'
-            if ~isempty(aCv.partition)
-                aPls.partition = aCv.partition;
-            else
-                aPls.partition = cvpartition(y, 'leave');
-            end
-        case 'LOOCV'
-            aPls.partition = cvpartition(y, 'leave');
-        case '10-fold'
-            aPls.partition = cvpartition(y, 'k', 10);
-        case '20-fold'
-            aPls.partition = cvpartition(y, 'k', 20);
-        case 'none'
-            aPls.features = MaxComponents;
-        otherwise
-            exitCode = -11;
-            pgp_util_error_message(exitCode, 'Optimization');
-%             error('Invalid value for property ''Optimization''');
-    end
-    
-end
 
 if exitCode == 0
     %% Train the all sample pls model, if requested open Save dialog
     try
         aTrainedPls = aPls.train(X, nominal(y));
-        
-        % @TODO classifier file needs to be passed as parameter
-        if strcmpi( SaveClassifier, 'yes')
-            % Save aTrainedPls and spotID
-        end
-    catch err
-        exitCode = -5;
-        pgp_util_error_message(exitCode, err.message);
-    end
-end
-%     
+        %     
 %     finalModelFile = [];
 %     if isequal(SaveClassifier, 'Yes')
 %         finalModel = aTrainedPls;
@@ -193,7 +46,17 @@ end
 %             save(finalModelFile, 'finalModel', 'spotID');
 %         end
 %     end
-%     
+% 
+        % @TODO classifier file needs to be passed as parameter
+        if strcmpi( SaveClassifier, 'yes')
+            % Save aTrainedPls and spotID
+        end
+    catch err
+        exitCode = -5;
+        pgp_util_error_message(exitCode, err.message);
+    end
+end
+    
 if exitCode == 0
     
     % if required perform cross validation

@@ -1,12 +1,8 @@
-function [exitCode, X, y, spotID, strLabel] = pgp_data_format(data, metaData)
+function [exitCode, X, y, spotID, strLabel] = pgp_data_format()
     exitCode = 0;
-    %% input formatting and checking
-    if length(unique(data.QuantitationType)) ~= 1
-        exitCode = -6;
-        pgp_util_error_message(exitCode);
-        return
-    end
-    % predictor matrix
+    global data
+    global metaData
+
     X = flat2mat(data.value, data.rowSeq, data.colSeq)';
     
     if any(isnan(X(:)))

@@ -2,6 +2,8 @@ function [dataTable, metaData, exitCode] = pgp_io_read_factor_table(filepath)
 %
 % filepath='/media/thiago/EXTRALINUX/Upwork/code/pg_plsda/data/FGFR example.txt.csv';
 exitCode = 0;
+dataTable = [];
+metaData = [];
 if ~exist(filepath, 'file')
     exitCode = -1;
     pgp_util_error_message(exitCode, filepath);
@@ -32,6 +34,23 @@ try
     end
 
     dataTable.value = dataTable.LFC;
+    
+    %%
+    clc
+    fprintf('[');
+    for i = 1:size(dataTable,1)
+        fprintf('"%s"', dataTable.Response{i});
+        
+        if i < size(dataTable,1)
+            fprintf(', ');
+        end
+        
+        if mod(i, 100) == 0
+            fprintf('\n');
+        end
+    end
+    fprintf(']');
+    
 %     dataTable.color = dataTable.Response;
 %%
     % @FIXME Automate the metadata information
