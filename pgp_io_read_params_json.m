@@ -10,7 +10,8 @@ global NumberOfBags
 global CrossValidation
 global Optimization
 global Permutations
-global OutputFile
+global OutputFileVis
+global OutputFileDat
 global QuantitationType
 
 
@@ -22,7 +23,8 @@ NumberOfBags    = 24;
 Bagging         = 'Balance';
 Optimization    = 'auto';
 Permutations    = 0;
-OutputFile      = '';
+OutputFileVis      = '';
+OutputFileDat      = '';
 QuantitationType = 'median';
 
 
@@ -189,16 +191,29 @@ try
             end
             
             
-            if isfield(param, 'OUTPUTFILE')
-                OutputFile = param.OUTPUTFILE;
+            if isfield(param, 'OUTPUTFILEVIS')
+                OutputFileVis = param.OUTPUTFILEVIS;
                 
-                isValid = ischar(OutputFile) && ...
-                    ~isempty(OutputFile) && ...
-                    ~isfolder(OutputFile);
+                isValid = ischar(OutputFileVis) && ...
+                    ~isempty(OutputFileVis) && ...
+                    ~isfolder(OutputFileVis);
                 
                 if ~isValid
                     exitCode = -11;
-                    pgp_util_error_message(exitCode, 'OutputFile');
+                    pgp_util_error_message(exitCode, 'OutputFileVis');
+                end
+            end
+            
+            if isfield(param, 'OUTPUTFILEDAT')
+                OutputFileDat = param.OUTPUTFILEDAT;
+                
+                isValid = ischar(OutputFileDat) && ...
+                    ~isempty(OutputFileDat) && ...
+                    ~isfolder(OutputFileDat);
+                
+                if ~isValid
+                    exitCode = -11;
+                    pgp_util_error_message(exitCode, 'OutputFileDat');
                 end
             end
         end
@@ -209,6 +224,7 @@ catch
     pgp_util_error_message(exitCode, jsonFile);
 end
 
+if exitCode == 0
     if isempty(rowFactor) || isempty(colFactor) || ...
         ~is_table_col(data, rowFactor) || ~is_table_col(data, colFactor)
         exitCode = -13;
@@ -237,6 +253,7 @@ end
     metaData{paramIdx,1} = 'colSeq'; 
     metaData{paramIdx,2} = 'colSeq'; paramIdx = paramIdx + 1;
 
+end
 end
 
 

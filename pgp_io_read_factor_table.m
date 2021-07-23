@@ -84,15 +84,4 @@ function idx = find_in_array(str, strList)
     end
 end
 
-% 
-% A direct link on the crosstab projection
-% 
 
-% 
-% the factor on the rows is "ID"
-% 
-% the factors on the columns are "Response" and "Cell.line"
-% 
-% an the color factor is "Response"
-% 
-% the value (or y axis) is LFC

@@ -138,8 +138,7 @@
 		"NumberOfBags":24,
 		"CrossValidation":"LOOCV",
 		"Optimization":"auto",
-		"Permutations":0,
-		"OutputFile":"/media/thiago/EXTRALINUX/Upwork/code/pg_plsda/test/output/plsda_results.txt",
+		"Permutations":5,		"OutputFileVis":"/media/thiago/EXTRALINUX/Upwork/code/pg_plsda/test/output/plsda_results_visualization.txt",	"OutputFileDat":"/media/thiago/EXTRALINUX/Upwork/code/pg_plsda/test/output/plsda_results_data.txt",
 		"RowFactor":"ID",
 		"ColFactor":"Cell.line",
 		"QuantitationType":"median"
