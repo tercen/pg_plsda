@@ -27,15 +27,8 @@ jsonStr = cat(2, jsonStr, '{');
 jsonStr = append_json_entry(jsonStr, 'perCv', perCv);
 jsonStr = cat(2, jsonStr, '}');
 
-
-
 jsonStr = cat(2, jsonStr, ']');
 
-% jsonencode(jsonStr)
-
-
-% jsonTxt = jsonencode(jsonStr);
-%
 
 [dirPath, ~, ~] = fileparts(OutputFileVis);
 
@@ -53,29 +46,29 @@ end
 end
 
 function jsonStr = append_json_entry(jsonStr, objName, objData)
-jsonStr = cat(2, jsonStr,'"objName":"', objName,'",');
+if ~isempty(objName)
+    jsonStr = cat(2, jsonStr,'"obj_name":"', objName,'",');
+end
+jsonStr = cat(2, jsonStr,'"obj_type":"', class(objData),'",');
 
-if isobject(objData)
-    
+if isobject(objData) 
     if length(objData) == 1
-        jsonStr = add_object( jsonStr, objData );
+        jsonStr = cat(2, jsonStr,'"obj_data":');
+        jsonStr = add_object( jsonStr, '', objData, false );
+        
     else
+        % ARRAY of objects
+        % Give it a name  for identification later
         jsonStr = cat(2, jsonStr,'"', class(objData), '_array":[');
         for i = 1:length(objData)
-            
-            jsonStr = cat(2, jsonStr, '{');
-            jsonStr = add_object( jsonStr, objData(i) );
-            jsonStr = cat(2, jsonStr, '}');
-            
-            if  i < length(objData)
-                jsonStr = cat(2, jsonStr, ',');
-            end
+
+            jsonStr = add_object( jsonStr, 'obj_data', objData(i),  i < length(objData) );
         end
+        
         jsonStr = cat(2, jsonStr,']');
     end
 else
-    vals = objData;
-    
+    vals     = objData;
     jsonStr = cat(2, jsonStr,'"data":');
     
     
@@ -91,25 +84,34 @@ else
     elseif isempty(vals)
         jsonStr = cat(2, jsonStr,'[]');
     else
-        
+        % Scalar value
         jsonStr = add_val(jsonStr, vals, false);
     end
 end
 
 end
 
-function jsonStr = add_object( jsonStr, objData )
+
+
+
+
+% Add a MATLAB Object (structure only, so far)
+function jsonStr = add_object( jsonStr, objName, objData, addComma )
+jsonStr = cat(2, jsonStr, '{');
+if ~isempty(objName)
+    jsonStr = cat(2, jsonStr,'"obj_name":"', objName,'",');
+end
+
 fieldNames = fieldnames(objData);
 nFields    = length(fieldNames);
 
 for i = 1:nFields
-    
+    jsonStr = cat(2, jsonStr,'"',  fieldNames{i} ,'_datatype":"', class( objData.(fieldNames{i}) ), '",');
     jsonStr = cat(2, jsonStr,'"',  fieldNames{i} ,'":');
     
     vals = objData.(fieldNames{i});
     
     if ~ischar(vals) && max(size(vals)) > 1
-        
         % Add an array
         [dim1, dim2] = size(vals);
         if dim2 > dim1
@@ -119,13 +121,7 @@ for i = 1:nFields
         jsonStr = add_array( jsonStr, vals, i < nFields  );
     else
         if isobject(vals)
-            jsonStr = cat(2, jsonStr, '{');
-            jsonStr = append_json_entry(jsonStr, class(vals), vals);
-            jsonStr = cat(2, jsonStr, '}');
-            
-            if  i < nFields
-                jsonStr = cat(2, jsonStr, ',');
-            end
+            jsonStr = add_object(jsonStr, class(vals), vals, i < nFields);
         elseif isempty(vals)
             jsonStr = cat(2, jsonStr,'[]');
             if  i < nFields
@@ -135,6 +131,12 @@ for i = 1:nFields
             jsonStr = add_val(jsonStr, vals, i < nFields);
         end
     end
+end
+
+jsonStr = cat(2, jsonStr, '}');
+
+if addComma == true
+    jsonStr = cat(2, jsonStr, ',');
 end
 end
 
@@ -191,13 +193,11 @@ end
 
 function jsonStr = add_numeric(jsonStr, val, addComma)
 
-if floor(val) == val
+if floor(val) == val %Integer number (not necessarily the int class)
     jsonStr = cat(2, jsonStr, sprintf('%d',val));
 else
     jsonStr = cat(2, jsonStr, sprintf('%.16f',val));
 end
-
-
 
 if addComma == true
     jsonStr = cat(2, jsonStr, ',');
@@ -206,13 +206,15 @@ end
 end
 
 
-function strOut =json_prettyprint(strIn)
+function strOut = json_prettyprint(strIn)
 
 nChar   = length(strIn);
 
+strOut  = repmat('', nChar*10, 1);
+outK    = 1;
+
 isArray = 0;
-strOut = '';
-nTabs  = 0;
+nTabs   = 0;
 for i = 1:nChar
     
     if strIn(i) == '['
@@ -225,31 +227,35 @@ for i = 1:nChar
     
     if strIn(i) == '{'
         
-        strOut(end+1) = '{';
-        strOut(end+1) = newline;
+        strOut(outK) = '{'; outK = outK + 1;
+        strOut(outK) = newline; outK = outK + 1;
         nTabs = nTabs + 1;
     elseif strIn(i) == '}'
-        strOut(end+1) = newline;
-        strOut(end+1) = '}';
-        
+        strOut(outK) = newline; outK = outK + 1;
+        strOut(outK) = '}'; outK = outK + 1;
         nTabs = nTabs - 1;
     elseif strIn(i) == ','
         if isArray
-            strOut(end+1) = ',';
+            strOut(outK) = ','; outK = outK + 1;
         else
-            strOut(end+1) = ',';
-            strOut(end+1) = newline;
+            strOut(outK) = ','; outK = outK + 1;
+            strOut(outK) = newline; outK = outK + 1;
             
         end
     else
+        if outK > 1 && strcmp(strOut(outK-1),newline) == 1
+            for w = 1:nTabs
+                for j = 1:4
+                    strOut(outK) = ' '; outK = outK + 1;
+                end
+            end
+        end
         
-        strOut(end+1) = strIn(i);
+        strOut(outK) = strIn(i); outK = outK + 1;
     end
     
 end
 
-% strOut = strrep(strIn, ',', ',\n');
-% add a return character after curly brackets:
-% strOut = strrep(strOut, '@', newline);
+strOut = strOut(1:(outK-1));
 
 end
