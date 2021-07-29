@@ -121,6 +121,7 @@ end
 
 
 if ~isempty(OutputFileVis) % For visualization
+    % FIXME GROUP IS EMPTY!! (though it is part og aTrainedPls)
     pgp_io_save_results(cvRes, aTrainedPls, perMcr, perCv, spotID);
 end
 
