@@ -1,10 +1,9 @@
 function pgp_io_save_results(cvRes, aTrainedPls, perMcr, perCv, spotID)
-% @TODO Clean up this code
+
 global OutputFileVis;
 
 
 jsonStr = '[';
-
 
 
 jsonStr = cat(2, jsonStr, '{');
@@ -163,16 +162,18 @@ if addComma == true
 end
 end
 
+
 function jsonStr = add_val(jsonStr, vals, comma)
+
 if iscell(vals) && length(vals) == 1 && ischar(vals{1})
     vals = vals{1};
 end
 
-if ischar(vals)
-    jsonStr = add_string(jsonStr, vals, comma);
+if ischar(vals) || strcmpi(class(vals), 'nominal')
+    jsonStr = add_string(jsonStr, char(vals), comma);
 end
 
-if isnumeric(vals) || islogical(vals)
+if isnumeric(vals) || islogical(vals) 
     jsonStr = add_numeric(jsonStr, vals, comma);
 end
 
@@ -251,7 +252,11 @@ for i = 1:nChar
             end
         end
         
+        try
         strOut(outK) = strIn(i); outK = outK + 1;
+        catch 
+            disp('.');
+        end
     end
     
 end
