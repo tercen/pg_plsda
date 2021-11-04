@@ -168,8 +168,8 @@ if iscell(vals) && length(vals) == 1 && ischar(vals{1})
     vals = vals{1};
 end
 
-if ischar(vals)
-    jsonStr = add_string(jsonStr, vals, comma);
+if ischar(vals) || strcmpi(class(vals), 'nominal')
+    jsonStr = add_string(jsonStr, char(vals), comma);
 end
 
 if isnumeric(vals) || islogical(vals)

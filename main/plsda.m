@@ -29,7 +29,7 @@ function [params, exitCode] = parse_arguments(argline)
     params   = struct;
     if isempty(argline)
         exitCode = -1000;
-        pg_error_message(exitCode);
+        pgp_util_error_message(exitCode);
         return
     end
     
@@ -38,7 +38,7 @@ function [params, exitCode] = parse_arguments(argline)
     
     if isempty(argStrValid) 
         exitCode = -1000;
-        pg_error_message(exitCode);
+        pgp_util_error_message(exitCode);
         return
     end
 

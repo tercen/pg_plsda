@@ -30,7 +30,7 @@ QuantitationType = 'median';
 
 if ~exist(jsonFile, 'file')
     exitCode = -1;
-    pg_error_message(exitCode, jsonFile);
+    pgp_util_error_message(exitCode, jsonFile);
     return
 end
 
