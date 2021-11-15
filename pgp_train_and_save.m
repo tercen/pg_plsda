@@ -1,4 +1,4 @@
-function [exitCode] = pgp_train(X, y, spotID, strLabel)
+function [exitCode] = pgp_train_and_save(X, y, spotID, strLabel)
 exitCode = 0;
 
 global MaxComponents
@@ -121,15 +121,20 @@ end
 
 
 if ~isempty(OutputFileVis) % For visualization
-    pgp_io_save_results(cvRes, aTrainedPls, perMcr, perCv, spotID);
+    save(OutputFileVis, 'cvRes', 'aTrainedPls', 'perMcr', 'perCv', 'spotID');
+    %pgp_io_save_results(cvRes, aTrainedPls, perMcr, perCv, spotID);
 end
 
 if ~isempty(OutputFileDat) % For visualization
     % output formatting for return to BN
+    
+    
+    aNumeric = [];
+    % Tercen 0-index data
     aHeader{1}    = 'rowSeq';
-    aNumeric(:,1) = double(data.rowSeq);
+    aNumeric(:,1) = double(data.rowSeq - 1);
     aHeader{2}    = 'colSeq';
-    aNumeric(:,2) = double(data.colSeq);
+    aNumeric(:,2) = double(data.colSeq - 1);
     
     lIdx = sub2ind(size(X'), data.rowSeq, data.colSeq); % linear index for converting matrix to flat output
     
@@ -140,6 +145,7 @@ if ~isempty(OutputFileDat) % For visualization
         beta = beta(lIdx);
         aNumeric(:, 2+i) = beta;
     end
+      
     nCols = size(aNumeric,2);
     nGroups = length(aTrainedPls.uGroup);
     if ~isempty(aCv.partition)

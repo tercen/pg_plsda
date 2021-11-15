@@ -61,6 +61,7 @@ try
             isfield(param, 'data' );
         
         if isDataObj == true
+            
             data.(param.name)    = param.data;
             metaData{paramIdx,1} = param.name;
             metaData{paramIdx,2} = param.type;
@@ -238,9 +239,12 @@ if exitCode == 0
     uniqueIds  = unique(data.(rowFactor), 'stable');
     uniqueCols = unique(data.(colFactor), 'stable');
         
+        
     data.rowSeq = zeros( nEntries, 1);
     data.colSeq = zeros( nEntries, 1);
 
+    
+    
     for i = 1:nEntries
 
         data.rowSeq(i) = internal_find_in_array( data.(rowFactor)(i), uniqueIds  );
@@ -248,6 +252,7 @@ if exitCode == 0
 
     end
     
+       
     metaData{paramIdx,1} = 'rowSeq'; 
     metaData{paramIdx,2} = 'rowSeq'; paramIdx = paramIdx + 1;
     metaData{paramIdx,1} = 'colSeq'; 

@@ -3,15 +3,16 @@ function [exitCode, X, y, spotID, strLabel] = pgp_data_format()
     global data
     global metaData
 
+        
     X = flat2mat(data.value, data.rowSeq, data.colSeq)';
     
-    if any(isnan(X(:)))
-        exitCode = -7;
-        pgp_util_error_message(exitCode);
-        return
-%         error('Missing values are not allowed');
-        
-    end
+    
+%     if any(isnan(X(:)))
+%         exitCode = -7;
+%         pgp_util_error_message(exitCode);
+%         return
+%     end
+    
     % response variable
     varType     = metaData(:,2);
     %get(data, 'VarDescription');
