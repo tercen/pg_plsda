@@ -18,6 +18,7 @@ if exitCode == 0
     [exitCode] = pgp_train_and_save(X, y, spotID, strLabel);
 end
 
+
 fprintf('Program finished with error code %d\n', exitCode);
 
 end % END of function pamsoft_grid

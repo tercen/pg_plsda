@@ -11,6 +11,8 @@ global OutputFileVis
 global OutputFileDat
 global Permutations
 global data
+global DiagnosticPlot
+global DiagnosticPlotPath
 
 try
     %% initialize cross validation object and pls object
@@ -118,6 +120,14 @@ end
 % save run data for showResults
 % @TODO see how to best save and show this
 %     save(fullfile(folder, 'runData.mat'), 'cvRes', 'aTrainedPls', 'perMcr', 'perCv', 'spotID');
+%@ TODO: Check DiagnosticPlot, save this file and then proceed to save it,
+%and return it
+runDataFile = cat(2, tempdir, filesep, randomFilename(), '.mat');
+save(runDataFile, 'cvRes', 'aTrainedPls', 'perMcr', 'perCv', 'spotID');
+showResults(runDataFile);
+delete(runDataFile);
+
+
 
 
 if ~isempty(OutputFileVis) % For visualization
@@ -185,4 +195,18 @@ if ~isempty(OutputFileDat) % For visualization
         'QuoteStrings',true, 'WriteMode','Append');
 end
 
+end
+
+
+function s = randomFilename()
+    s = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+    %find number of random characters to choose from
+    numRands = length(s); 
+
+    %specify length of random string to generate
+    sLength = 15;
+
+    %generate random string
+    s = s( ceil(rand(1,sLength)*numRands) );
 end

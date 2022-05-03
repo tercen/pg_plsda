@@ -13,6 +13,8 @@ global Permutations
 global OutputFileVis
 global OutputFileDat
 global QuantitationType
+global DiagnosticPlot
+global DiagnosticPlotPath
 
 
 % Default Values
@@ -26,6 +28,7 @@ Permutations    = 0;
 OutputFileVis      = '';
 OutputFileDat      = '';
 QuantitationType = 'median';
+DiagnosticPlot   = 'Advanced';
 
 
 if ~exist(jsonFile, 'file')
@@ -161,22 +164,39 @@ try
                 end
             end
             
-            
-            if isfield(param, 'OPTIMIZATION')
-                Optimization = param.OPTIMIZATION;
+            if isfield(param, 'DIAGNOSTICPLOT')
+                DiagnosticPlot = param.DIAGNOSTICPLOT;
                 
-                isValid = ischar(Optimization) && ...
-                    (strcmpi(Optimization, 'auto') || ...
-                    strcmpi(Optimization, 'LOOCV') || ...
-                    strcmpi(Optimization, '10-fold') || ...
-                    strcmpi(Optimization, '20-fold') || ...
-                    strcmpi(Optimization, 'none'));
+                isValid = ischar(DiagnosticPlot) && ...
+                    (strcmpi(DiagnosticPlot, 'None') || ...
+                    strcmpi(DiagnosticPlot, 'Basic') || ...
+                    strcmpi(DiagnosticPlot, 'Advanced'));
                 
                 if ~isValid
                     exitCode = -11;
                     pgp_util_error_message(exitCode, 'Optimization');
                     pgp_util_error_message(-111, sprintf('[None], LOOCV, 10-fold, 20-fold, Auto'));
                 end
+            end
+            
+            if isfield(param, 'DIAGNOSTICPLOT')
+                DiagnosticPlot = param.DIAGNOSTICPLOT;
+                
+                isValid = ischar(DiagnosticPlot) && ...
+                    (strcmpi(DiagnosticPlot, 'None') || ...
+                    strcmpi(DiagnosticPlot, 'Basic') || ...
+                    strcmpi(DiagnosticPlot, 'Advanced'));
+                
+                if ~isValid
+                    exitCode = -11;
+                    pgp_util_error_message(exitCode, 'Optimization');
+                    pgp_util_error_message(-111, sprintf('[None], LOOCV, 10-fold, 20-fold, Auto'));
+                end
+            end
+            
+            
+            if isfield(param, 'DIAGNOSTICPLOTPATH')
+                DiagnosticPlotPath = param.DIAGNOSTICPLOTPATH;
             end
             
             
