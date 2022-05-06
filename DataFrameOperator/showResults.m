@@ -9,7 +9,8 @@ global CrossValidation
 global Optimization
 global Permutations
 global SaveClassifier
-global ShowResultsMode
+
+global DiagnosticPlot
 global DiagnosticPlotPath
 
 %runDataFile = fullfile(folder, 'runData.mat');
@@ -20,7 +21,7 @@ else
 end
 
 % check parameter
-ShowResultsMode = 'Advanced'; 
+ShowResultsMode = DiagnosticPlot; 
 titleSz = 18;
 lblSz   = 16;
 axSz    = 13;
@@ -31,17 +32,10 @@ switch ShowResultsMode
     case 'Advanced'
         bAdvanced = true;
     otherwise
-        error('Invalid value for property ''ShowResultsMode''');
+        error('Invalid value for property ''DiagnosticPlot''');
 end
 
-% open runfolder
-% if bAdvanced
-%     try
-%         eval(['!open "',runDataFile,'"']);
-%     catch
-%         msgbox('Error opening run folder', 'PLS-DA show results', 'warn');
-%     end
-% end
+
 % graph output
 fig = figure('Color', 'w','Position', [0,0,1400,1500], 'Renderer', 'painters');
 
@@ -198,10 +192,13 @@ end
 set(gcf, 'PaperUnits', 'centimeters');
 set(gcf, 'PaperPosition', [0 0 23*2 18*2]);
 
+[folder, filename, ext] = fileparts(DiagnosticPlotPath);
 
-%exportgraphics(fig, DiagnosticPlotPath, 'Resolution', 144);
-
-print('-painters','-dsvg', '-r144', DiagnosticPlotPath)
+if strcmpi(ext, '.png')
+    exportgraphics(fig, DiagnosticPlotPath, 'Resolution', 72);
+else
+    print('-painters','-dsvg', '-r144', DiagnosticPlotPath)
+end
 
 
 close all;
