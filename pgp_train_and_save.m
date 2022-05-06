@@ -7,8 +7,8 @@ global Bagging
 global NumberOfBags
 global CrossValidation
 global Optimization
-global OutputFileVis
-global OutputFileDat
+global OutputFileMat
+global OutputFileTxt
 global Permutations
 global data
 global DiagnosticPlot
@@ -122,20 +122,24 @@ end
 %     save(fullfile(folder, 'runData.mat'), 'cvRes', 'aTrainedPls', 'perMcr', 'perCv', 'spotID');
 %@ TODO: Check DiagnosticPlot, save this file and then proceed to save it,
 %and return it
-runDataFile = cat(2, tempdir, filesep, randomFilename(), '.mat');
-save(runDataFile, 'cvRes', 'aTrainedPls', 'perMcr', 'perCv', 'spotID');
-showResults(runDataFile);
-delete(runDataFile);
+if ~strcmpi(DiagnosticPlot, 'none')
+    runDataFile = cat(2, tempdir, filesep, randomFilename(), '.mat');
+    save(runDataFile, 'cvRes', 'aTrainedPls', 'perMcr', 'perCv', 'spotID');
+    showResults(runDataFile);
+    delete(runDataFile);
+end
 
 
 
 
-if ~isempty(OutputFileVis) % For visualization
-    save(OutputFileVis, 'cvRes', 'aTrainedPls', 'perMcr', 'perCv', 'spotID');
+if ~isempty(OutputFileMat) % For visualization
+    save(OutputFileMat, 'cvRes', 'aTrainedPls', 'perMcr', 'perCv', 'spotID');
+    
+    fprintf('Successfully saved %s\n', OutputFileMat);
     %pgp_io_save_results(cvRes, aTrainedPls, perMcr, perCv, spotID);
 end
 
-if ~isempty(OutputFileDat) % For visualization
+if ~isempty(OutputFileTxt) % For visualization
     % output formatting for return to BN
     
     
@@ -175,10 +179,10 @@ if ~isempty(OutputFileDat) % For visualization
     tbl = table( aNumeric );
     
 
-    if exist(OutputFileDat, 'file')
-        delete( OutputFileDat );
+    if exist(OutputFileTxt, 'file')
+        delete( OutputFileTxt );
     end
-    fid = fopen(OutputFileDat, 'w+');
+    fid = fopen(OutputFileTxt, 'w+');
     for qi = 1:length(aHeader)
         fprintf(fid, '%s', aHeader{qi});
 
@@ -191,8 +195,10 @@ if ~isempty(OutputFileDat) % For visualization
 
     
     
-    writetable(tbl, OutputFileDat,'WriteRowNames',false, ...
+    writetable(tbl, OutputFileTxt,'WriteRowNames',false, ...
         'QuoteStrings',true, 'WriteMode','Append');
+    
+    fprintf('Successfully saved %s\n', OutputFileTxt);
 end
 
 end

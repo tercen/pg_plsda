@@ -10,8 +10,8 @@ global NumberOfBags
 global CrossValidation
 global Optimization
 global Permutations
-global OutputFileVis
-global OutputFileDat
+global OutputFileMat
+global OutputFileTxt
 global QuantitationType
 global DiagnosticPlot
 global DiagnosticPlotPath
@@ -25,8 +25,8 @@ NumberOfBags    = 24;
 Bagging         = 'Balance';
 Optimization    = 'auto';
 Permutations    = 0;
-OutputFileVis      = '';
-OutputFileDat      = '';
+OutputFileMat      = '';
+OutputFileTxt      = '';
 QuantitationType = 'median';
 DiagnosticPlot   = 'Advanced';
 
@@ -212,29 +212,29 @@ try
             end
             
             
-            if isfield(param, 'OUTPUTFILEVIS')
-                OutputFileVis = param.OUTPUTFILEVIS;
+            if isfield(param, 'OUTPUTFILEMAT')
+                OutputFileMat = param.OUTPUTFILEMAT;
                 
-                isValid = ischar(OutputFileVis) && ...
-                    ~isempty(OutputFileVis) && ...
-                    ~isfolder(OutputFileVis);
+                isValid = ischar(OutputFileMat) && ...
+                    ~isempty(OutputFileMat) && ...
+                    ~isfolder(OutputFileMat);
                 
                 if ~isValid
                     exitCode = -11;
-                    pgp_util_error_message(exitCode, 'OutputFileVis');
+                    pgp_util_error_message(exitCode, 'OutputFileMat');
                 end
             end
             
-            if isfield(param, 'OUTPUTFILEDAT')
-                OutputFileDat = param.OUTPUTFILEDAT;
+            if isfield(param, 'OUTPUTFILETXT')
+                OutputFileTxt = param.OUTPUTFILETXT;
                 
-                isValid = ischar(OutputFileDat) && ...
-                    ~isempty(OutputFileDat) && ...
-                    ~isfolder(OutputFileDat);
+                isValid = ischar(OutputFileTxt) && ...
+                    ~isempty(OutputFileTxt) && ...
+                    ~isfolder(OutputFileTxt);
                 
                 if ~isValid
                     exitCode = -11;
-                    pgp_util_error_message(exitCode, 'OutputFileDat');
+                    pgp_util_error_message(exitCode, 'OutputFileTxt');
                 end
             end
         end
